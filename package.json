@@ -1,1 +1,18 @@
-{}
+{
+  "devDependencies": {
+    "budo": "^5.1.5"
+  },
+  "scripts" : {
+    "dev" : "budo voxel-software-raytrace.js --live"
+  },
+  "dependencies": {
+    "camera-unproject": "^1.0.1",
+    "fc": "^1.4.3",
+    "gl-mat4": "^1.1.4",
+    "gl-vec3": "^1.0.3",
+    "ndarray": "^1.0.18",
+    "ndarray-fill": "^1.0.1",
+    "orbit-camera": "^1.0.0",
+    "ray-aabb": "^3.0.1"
+  }
+}
