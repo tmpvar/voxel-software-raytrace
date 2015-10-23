@@ -1,5 +1,5 @@
 // TODO: consider replacing with something like: http://www.cse.chalmers.se/edu/year/2010/course/TDA361/grid.pdf
-module.exports = calcStraightLine2d;
+module.exports = findOccupiedCell;
 
 function sign(a) {
   return typeof a === 'number' ? a ? a < 0 ? -1 : 1 : a === a ? 0 : 0 : 0
@@ -12,7 +12,7 @@ function diff(s, ds) {
   return ds > 0 ? (1-s) / ds : s/-ds;
 }
 
-function calcStraightLine2d(aabb, isect, rd, pixels) {
+function findOccupiedCell(aabb, isect, rd, pixels) {
   var ubx = (aabb[1][0] - aabb[0][0])+1;
   var uby = (aabb[1][1] - aabb[0][1])+1;
   var ubz = (aabb[1][2] - aabb[0][2])+1;
