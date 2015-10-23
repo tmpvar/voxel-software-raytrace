@@ -6,6 +6,7 @@ function sign(a) {
 }
 
 function diff(s, ds) {
+  s = typeof s === 'number' ? s : 0;
   var is = s|0;
 
   s -= (s < 0) ? -1 + is : is
@@ -13,25 +14,25 @@ function diff(s, ds) {
 }
 
 function findOccupiedCell(ubx, uby, ubz, isect, rd, pixels, out) {
-  var rdx = rd[0];
-  var rdy = rd[1];
-  var rdz = rd[2];
+  var rdx = +(rd[0]);
+  var rdy = +(rd[1]);
+  var rdz = +(rd[2]);
 
   var sx = sign(rdx);
   var sy = sign(rdy);
   var sz = sign(rdz);
 
-  var x = isect[0] - rd[0];
-  var y = isect[1] - rd[1];
-  var z = isect[2] - rd[2];
+  var x = +(isect[0]) - +(rd[0]);
+  var y = +(isect[1]) - +(rd[1]);
+  var z = +(isect[2]) - +(rd[2]);
 
   var mx = diff(x, rdx);
   var my = diff(y, rdy);
   var mz = diff(z, rdz);
 
-  var dx = sx/rdx;
-  var dy = sy/rdy;
-  var dz = sz/rdz;
+  var dx = +(sx/rdx);
+  var dy = +(sy/rdy);
+  var dz = +(sz/rdz);
 
   // TODO: handle NaN
 
@@ -53,18 +54,18 @@ function findOccupiedCell(ubx, uby, ubz, isect, rd, pixels, out) {
 
     if(mx < my) {
       if(mx < mz) {
-        x+=sx;
+        x += sx;
         mx += dx;
       } else {
-        z+=sz;
-        mz+=dz;
+        z += sz;
+        mz += dz;
       }
     } else {
       if(my < mz) {
-        y+=sy;
-        my+=dy;
+        y += sy;
+        my += dy;
       } else {
-        z+=sz;
+        z += sz;
         mz += dz;
       }
     }
