@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "benchmark": "^1.0.0",
     "budo": "^5.1.5",
     "gl-vec2": "^1.0.0",
     "tape": "^4.2.1"

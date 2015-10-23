@@ -12,11 +12,7 @@ function diff(s, ds) {
   return ds > 0 ? (1-s) / ds : s/-ds;
 }
 
-function findOccupiedCell(aabb, isect, rd, pixels) {
-  var ubx = (aabb[1][0] - aabb[0][0])+1;
-  var uby = (aabb[1][1] - aabb[0][1])+1;
-  var ubz = (aabb[1][2] - aabb[0][2])+1;
-
+function findOccupiedCell(ubx, uby, ubz, isect, rd, pixels, out) {
   var rdx = rd[0];
   var rdy = rd[1];
   var rdz = rd[2];
@@ -37,17 +33,22 @@ function findOccupiedCell(aabb, isect, rd, pixels) {
   var dy = sy/rdy;
   var dz = sz/rdz;
 
+  // TODO: handle NaN
+
   while (
     x >= -1 && y >= -1 && z >= -1 &&
     x <= ubx && y <= uby && z <= ubz
   ) {
+
     var ix = x|0;
     var iy = y|0;
     var iz = z|0;
-    //visit(ix, iy);
 
     if (pixels.get(ix, iy, iz)) {
-      return [ix, iy, iz];
+      out[0] = ix;
+      out[1] = iy;
+      out[2] = iz;
+      return out;
     }
 
     if(mx < my) {
@@ -68,4 +69,5 @@ function findOccupiedCell(aabb, isect, rd, pixels) {
       }
     }
   }
+  return false;
 }

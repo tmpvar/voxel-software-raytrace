@@ -19,7 +19,7 @@ var findOccupiedCell = require('./find-occupied-cell');
 
 var createOrbitCamera = require("orbit-camera")
 
-var modelWidth = 8
+var modelWidth = 16
 var modelHalfWidth = modelWidth/2;
 var camera = createOrbitCamera([5, 5, -100],
                                [modelHalfWidth, modelHalfWidth, modelHalfWidth],
@@ -95,6 +95,7 @@ window.addEventListener('mousewheel', function(ev) {
 
 var viewport = [0, 0, 0, 0];
 var near = [0, 0, 0];
+var voxel = [0, 0, 0];
 
 var ctx = fc(function render() {
   ctx.clear();
@@ -150,7 +151,7 @@ var ctx = fc(function render() {
       if (d) {
         v3add(isect, rayOrigin, v3scale(isect, rayDirection, d))
 
-        cell = findOccupiedCell(modelBounds, isect, rayDirection, model)
+        cell = findOccupiedCell(modelWidth+1, modelWidth+1, modelWidth+1, isect, rayDirection, model, voxel)
 
         if (cell) {
           var d = ray.intersects([
