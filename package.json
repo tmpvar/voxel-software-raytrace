@@ -1,9 +1,11 @@
 {
   "devDependencies": {
-    "budo": "^5.1.5"
+    "budo": "^5.1.5",
+    "gl-vec2": "^1.0.0",
+    "tape": "^4.2.1"
   },
-  "scripts" : {
-    "dev" : "budo voxel-software-raytrace.js --live"
+  "scripts": {
+    "dev": "budo voxel-software-raytrace.js --live"
   },
   "dependencies": {
     "camera-unproject": "^1.0.1",

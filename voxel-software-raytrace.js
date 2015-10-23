@@ -15,11 +15,14 @@ var createRay = require('../ray-aabb');
 var ndarray = require('ndarray');
 var fill = require('ndarray-fill');
 var unproject = require('camera-unproject');
+var findOccupiedCell = require('./find-occupied-cell');
 
 var createOrbitCamera = require("orbit-camera")
 
+var modelWidth = 8
+var modelHalfWidth = modelWidth/2;
 var camera = createOrbitCamera([5, 5, -100],
-                               [0, 0, 0],
+                               [modelHalfWidth, modelHalfWidth, modelHalfWidth],
                                [0, 1, 0])
 var projection = m4create();
 var view = m4create();
@@ -37,39 +40,17 @@ var tnormal = [0, 0, 0];
 var isect = [0, 0, 0];
 
 var ray = createRay(rayOrigin, rayDirection);
-var modelWidth = 16
-var modelHalfWidth = modelWidth/2;
+
 var modelBounds = [
-  [-modelHalfWidth, -modelHalfWidth, -modelHalfWidth],
-  [modelHalfWidth, modelHalfWidth, modelHalfWidth]
+  [0, 0, 0],
+  [modelWidth, modelWidth, modelWidth]
 ];
+
 var model = ndarray(new Uint8Array(modelWidth*modelWidth*modelWidth), [modelWidth, modelWidth, modelWidth]);
-var depthSorted = [];
-var depthPos = 0;
 fill(model, function(x, y, z) {
-
   if (x%2 && y%2 && z%2) {
-
-    // poor mans compression
-    x = -modelHalfWidth + x;
-    y = -modelHalfWidth + y;
-    z = -modelHalfWidth + z;
-
-    var bounds = [
-      [x - 0.5, y - 0.5, z - 0.5],
-      [x + 0.5, y + 0.5, z + 0.5]
-    ];
-
-    var center = [
-      (bounds[0][0] + bounds[1][0]) / 2,
-      (bounds[0][1] + bounds[1][1]) / 2,
-      (bounds[0][2] + bounds[1][2]) / 2
-    ];
-    depthSorted.push([bounds, center, depthPos]);
     return 255;
   }
-
-  depthPos++;
   return 0;
 })
 
@@ -117,8 +98,8 @@ var near = [0, 0, 0];
 
 var ctx = fc(function render() {
   ctx.clear();
-  // ctx.canvas.width = 200;
-  // ctx.canvas.height = 200
+  ctx.canvas.width = 400;
+  ctx.canvas.height = 400;
   var w = viewport[2] = ctx.canvas.width;
   var h = viewport[3] = ctx.canvas.height;
   var imageData = ctx.createImageData(w, h);
@@ -142,12 +123,6 @@ var ctx = fc(function render() {
 
   getEye(rayOrigin, view);
 
-  depthSorted.sort(function depthSort(a, b) {
-    var da = v3distSquared(a[1], rayOrigin);
-    var db = v3distSquared(b[1], rayOrigin);
-    return da-db;
-  })
-console.log('depthSorted', depthSorted.length)
   for (var y=0; y<h; y++) {
     near[1] = y;
 
@@ -156,10 +131,10 @@ console.log('depthSorted', depthSorted.length)
 
       unproject(rayDirection, near, viewport, m4inverted)
 
-      // v3normalize(
-      //   rayDirection,
+      v3normalize(
+        rayDirection,
         v3sub(rayDirection, rayDirection, rayOrigin)
-      // );
+      );
 
       // test outer bounding box
       ray.update(rayOrigin, rayDirection);
@@ -170,30 +145,23 @@ console.log('depthSorted', depthSorted.length)
       buffer[c+2] = 0x22;
       buffer[c+3] = 0xff;
 
-      if (!ray.intersects(modelBounds)) {
-        continue;
-      } else {
-        buffer[c+0] = 255;//127 + tnormal[0]*255;
-        buffer[c+1] = 255;//127 + tnormal[1]*255;
-        buffer[c+2] = 255;//127 + tnormal[2]*255;
-        buffer[c+3] = 255;
-        continue;
-      }
+      var d = ray.intersects(modelBounds, normal)
 
-      var l = depthSorted.length;
-      for (var i=0; i<l; i++) {
-        var o = depthSorted[i];
-        if (!o) {
-          continue;
-        }
-        var d = ray.intersects(o[0])
-        if (d !== false) {
-          // v3normalize(tnormal, normal)
-          buffer[c+0] = 255;//127 + tnormal[0]*255;
-          buffer[c+1] = 255;//127 + tnormal[1]*255;
-          buffer[c+2] = 255;//127 + tnormal[2]*255;
-          buffer[c+3] = 255
-          break;
+      if (d) {
+        v3add(isect, rayOrigin, v3scale(isect, rayDirection, d))
+
+        cell = findOccupiedCell(modelBounds, isect, rayDirection, model)
+
+        if (cell) {
+          var d = ray.intersects([
+            [cell[0], cell[1], cell[2]],
+            [cell[0]+1, cell[1]+1, cell[2]+1],
+          ], normal)
+          v3normalize(tnormal, normal)
+          buffer[c+0] = 127 + tnormal[0]*255;
+          buffer[c+1] = 127 + tnormal[1]*255;
+          buffer[c+2] = 127 + tnormal[2]*255;
+          buffer[c+3] = 255;
         }
       }
     }
