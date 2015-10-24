@@ -62,6 +62,18 @@ function getEye(out, view) {
   return out;
 }
 
+var paused = false;
+window.addEventListener('keydown', function(ev) {
+  if (ev.keyCode === 32) {
+    paused = !paused;
+    if (paused) {
+      ctx.stop();
+    } else {
+      ctx.start();
+    }
+  }
+})
+
 window.addEventListener('mousedown', function() {
   mouseDown = true;
 });
@@ -105,7 +117,7 @@ var ctx = fc(function render() {
   var h = viewport[3] = ctx.canvas.height;
   var imageData = ctx.createImageData(w, h);
   var buffer = imageData.data;
-
+camera.rotate([0, 0], [.1, .1])
   var aspect = w/h
   m4perspective(
     projection,
@@ -180,4 +192,4 @@ var ctx = fc(function render() {
   }
 
   ctx.putImageData(imageData, 0, 0);
-})
+}, true)
