@@ -101,7 +101,7 @@ window.addEventListener('mousemove', function(ev) {
 
 window.addEventListener('mousewheel', function(ev) {
   camera.zoom(ev.wheelDeltaY * -.001);
-  ctx.dirty();
+  // ctx.dirty();
   ev.preventDefault();
 });
 
@@ -114,12 +114,23 @@ var planeXPosition = [0, 0, 0];
 var planeYPosition = [0, 0, 0];
 var dcol = [0, 0, 0];
 var drow = [0, 0, 0];
-var rda = [0,0,0]
-var rdb = [0,0,0]
-var rdc = [0,0,0]
+var rda = [0,0,0];
+var rdb = [0,0,0];
 
+// timing
+var deficit = 0;
+var frames = 0;
+setInterval(function() {
+  console.clear();
+  console.log('average frame deficit: ', deficit.toFixed(2) + 'ms - fps:', frames)
+  deficit = 0;
+  frames = 0;
+}, 1000)
 
-var ctx = fc(function render() {
+var ctx = fc(function render(dt) {
+  frames++;
+  deficit = (deficit + (dt - 16.7))/2
+
   ctx.clear();
   ctx.canvas.width = 400;
   ctx.canvas.height = 400;
