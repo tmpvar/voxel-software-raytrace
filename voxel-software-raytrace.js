@@ -19,7 +19,7 @@ var findOccupiedCell = require('./find-occupied-cell');
 
 var createOrbitCamera = require("orbit-camera")
 
-var modelWidth = 16
+var modelWidth = 32
 var modelHalfWidth = modelWidth/2;
 var camera = createOrbitCamera([modelHalfWidth, modelHalfWidth, -100],
                                [modelHalfWidth, modelHalfWidth, modelHalfWidth],
@@ -48,10 +48,19 @@ var modelBounds = [
 
 var model = ndarray(new Uint8Array(modelWidth*modelWidth*modelWidth), [modelWidth, modelWidth, modelWidth]);
 fill(model, function(x, y, z) {
-  if (x%2 && y%2 && z%2) {
-    return 255;
-  }
-  return 0;
+  normal[0] = x - modelHalfWidth
+  normal[1] = y - modelHalfWidth
+  normal[2] = z - modelHalfWidth
+  var d = v3length(normal);
+  // if (d<modelHalfWidth) {
+    return 255 - Math.round((d - modelHalfWidth)/modelHalfWidth * 255);
+  // }
+
+
+  // if (x%2 && y%2 && z%2) {
+  //   return 255;
+  // }
+  // return 0;
 })
 
 function getEye(out, view) {
@@ -127,6 +136,9 @@ setInterval(function() {
   frames = 0;
 }, 1000)
 
+var density = 0;
+var densityDir = 1;
+
 var ctx = fc(function render(dt) {
   frames++;
   deficit = (deficit + (dt - 16.7))/2
@@ -138,7 +150,9 @@ var ctx = fc(function render(dt) {
   var h = viewport[3] = ctx.canvas.height;
   var imageData = ctx.createImageData(w, h);
   var buffer = imageData.data;
-camera.rotate([0, 0], [.1, .1])
+
+camera.rotate([0, 0], [.01, .01])
+
   var aspect = w/h
   m4perspective(
     projection,
@@ -157,12 +171,21 @@ camera.rotate([0, 0], [.1, .1])
 
   getEye(rayOrigin, view);
 
+
   unproject(rda, [0,0,0], viewport, m4inverted) // x=0, y=0
   unproject(rdb, [1,0,0], viewport, m4inverted) // x=1, y=0
   unproject(planeYPosition, [0,1,0], viewport, m4inverted) // x=0, y=1
 
   v3sub(dcol, planeYPosition, rda);
   v3sub(drow, rdb, rda);
+
+  density+=densityDir;
+  if (density > 254) {
+    densityDir = -1;
+  } else if (density === 0) {
+    densityDir = 1;
+  }
+
 
   for (var y=0; y<h; y++) {
     planeYPosition[0] += dcol[0];
@@ -187,19 +210,24 @@ camera.rotate([0, 0], [.1, .1])
       ray.update(rayOrigin, rayDirection);
       var c = x*4 + y*w*4;
 
-      buffer[c+0] = 0x11;
-      buffer[c+1] = 0x11;
-      buffer[c+2] = 0x22;
-      buffer[c+3] = 0xff;
-
       var d = ray.intersects(modelBounds, normal)
-
+      var found = false;
       if (d) {
         v3add(isect, rayOrigin, v3scale(isect, rayDirection, d))
 
-        cell = findOccupiedCell(modelWidth+1, modelWidth+1, modelWidth+1, isect, rayDirection, model, voxel)
+        cell = findOccupiedCell(
+          modelWidth+1,
+          modelWidth+1,
+          modelWidth+1,
+          isect,
+          rayDirection,
+          model,
+          density,
+          voxel
+        )
 
         if (cell) {
+          found = true;
           var d = ray.intersects([
             [cell[0], cell[1], cell[2]],
             [cell[0]+1, cell[1]+1, cell[2]+1],
