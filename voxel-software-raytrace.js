@@ -109,6 +109,16 @@ var viewport = [0, 0, 0, 0];
 var near = [0, 0, 0];
 var voxel = [0, 0, 0];
 
+// screen traversal storage
+var planeXPosition = [0, 0, 0];
+var planeYPosition = [0, 0, 0];
+var dcol = [0, 0, 0];
+var drow = [0, 0, 0];
+var rda = [0,0,0]
+var rdb = [0,0,0]
+var rdc = [0,0,0]
+
+
 var ctx = fc(function render() {
   ctx.clear();
   ctx.canvas.width = 400;
@@ -136,25 +146,27 @@ camera.rotate([0, 0], [.1, .1])
 
   getEye(rayOrigin, view);
 
-  var rda = [0,0,0]
-  var rdb = [0,0,0]
-  var rdc = [0,0,0]
-
   unproject(rda, [0,0,0], viewport, m4inverted) // x=0, y=0
   unproject(rdb, [1,0,0], viewport, m4inverted) // x=1, y=0
-  unproject(rdc, [0,1,0], viewport, m4inverted) // x=0, y=1
+  unproject(planeYPosition, [0,1,0], viewport, m4inverted) // x=0, y=1
 
-  var dcol = v3sub([0, 0, 0], rdc, rda);
-  var drow = v3sub([0, 0, 0], rdb, rda);
-
-  var planeYPosition = [0, 0, 0];
-  var planeXPosition = [0, 0, 0];
+  v3sub(dcol, planeYPosition, rda);
+  v3sub(drow, rdb, rda);
 
   for (var y=0; y<h; y++) {
-    v3add(planeYPosition, rda, v3scale([0, 0, 0], dcol, y));
+    planeYPosition[0] += dcol[0];
+    planeYPosition[1] += dcol[1];
+    planeYPosition[2] += dcol[2];
+
+    planeXPosition[0] = planeYPosition[0]
+    planeXPosition[1] = planeYPosition[1]
+    planeXPosition[2] = planeYPosition[2]
 
     for (var x=0; x<w; x++) {
-      v3add(planeXPosition, planeYPosition, v3scale([0, 0, 0], drow, x))
+      planeXPosition[0] += drow[0];
+      planeXPosition[1] += drow[1];
+      planeXPosition[2] += drow[2];
+
       v3normalize(
         rayDirection,
         v3sub(rayDirection, planeXPosition, rayOrigin)
