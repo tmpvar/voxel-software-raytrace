@@ -7,6 +7,7 @@ var v3add = require('gl-vec3/add');
 var v3dist = require('gl-vec3/distance');
 var v3distSquared = require('gl-vec3/squaredDistance');
 var v3tm4 = require('gl-vec3/transformMat4');
+var v3length = require('gl-vec3/length');
 var m4create = require('gl-mat4/create');
 var m4perspective = require('gl-mat4/perspective');
 var m4invert = require('gl-mat4/invert');
