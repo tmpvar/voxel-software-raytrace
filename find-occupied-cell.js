@@ -6,14 +6,13 @@ function sign(a) {
 }
 
 function diff(s, ds) {
-  s = typeof s === 'number' ? s : 0;
   var is = s|0;
 
   s -= (s < 0) ? -1 + is : is
-  return ds > 0 ? (1-s) / ds : s/-ds;
+  return ds > 0 ? (1-s) / ds : s / -ds;
 }
 
-function findOccupiedCell(ubx, uby, ubz, isect, rd, pixels, out) {
+function findOccupiedCell(ubx, uby, ubz, isect, rd, pixels, density, out) {
   var rdx = +(rd[0]);
   var rdy = +(rd[1]);
   var rdz = +(rd[2]);
@@ -22,9 +21,9 @@ function findOccupiedCell(ubx, uby, ubz, isect, rd, pixels, out) {
   var sy = sign(rdy);
   var sz = sign(rdz);
 
-  var x = +(isect[0]) - +(rd[0]);
-  var y = +(isect[1]) - +(rd[1]);
-  var z = +(isect[2]) - +(rd[2]);
+  var x = +(isect[0]);
+  var y = +(isect[1]);
+  var z = +(isect[2]);
 
   var mx = diff(x, rdx);
   var my = diff(y, rdy);
@@ -37,7 +36,7 @@ function findOccupiedCell(ubx, uby, ubz, isect, rd, pixels, out) {
   // TODO: handle NaN
 
   while (
-    x >= -1 && y >= -1 && z >= -1 &&
+    x >= -rdx && y >= -rdy && z >= -rdz &&
     x <= ubx && y <= uby && z <= ubz
   ) {
 
@@ -45,7 +44,7 @@ function findOccupiedCell(ubx, uby, ubz, isect, rd, pixels, out) {
     var iy = y|0;
     var iz = z|0;
 
-    if (pixels.get(ix, iy, iz)) {
+    if (pixels.get(ix, iy, iz) > density) {
       out[0] = ix;
       out[1] = iy;
       out[2] = iz;

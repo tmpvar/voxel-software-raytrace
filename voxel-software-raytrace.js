@@ -5,6 +5,7 @@ var v3mul = require('gl-vec3/multiply');
 var v3scale = require('gl-vec3/scale');
 var v3add = require('gl-vec3/add');
 var v3dist = require('gl-vec3/distance');
+var v3length = require('gl-vec3/length');
 var v3distSquared = require('gl-vec3/squaredDistance');
 var v3tm4 = require('gl-vec3/transformMat4');
 var v3length = require('gl-vec3/length');
@@ -239,6 +240,13 @@ camera.rotate([0, 0], [.01, .01])
           buffer[c+2] = 127 + tnormal[2]*255;
           buffer[c+3] = 255;
         }
+      }
+
+      if (!found) {
+        buffer[c+0] = 0x11;
+        buffer[c+1] = 0x11;
+        buffer[c+2] = 0x22;
+        buffer[c+3] = 0xff;
       }
     }
   }
