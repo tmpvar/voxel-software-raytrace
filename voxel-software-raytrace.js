@@ -73,7 +73,7 @@ function getEye(out, view) {
   return out;
 }
 
-var paused = false;
+var paused = true;
 window.addEventListener('keydown', function(ev) {
   if (ev.keyCode === 32) {
     paused = !paused;
@@ -98,8 +98,8 @@ window.addEventListener('mousemove', function(ev) {
   var y = ev.clientY;
 
   if (mouseDown) {
-    var w = ctx.canvas.width;
-    var h = ctx.canvas.height;
+    var w = window.innerWidth;
+    var h = window.innerHeight;
     camera.rotate(
       [x/w-0.5, y/h-0.5],
       [mouse[0]/w-0.5, mouse[1]/h-0.5]
@@ -112,7 +112,7 @@ window.addEventListener('mousemove', function(ev) {
 
 window.addEventListener('mousewheel', function(ev) {
   camera.zoom(ev.wheelDeltaY * -.001);
-  // ctx.dirty();
+  paused && ctx.dirty();
   ev.preventDefault();
 });
 
@@ -132,10 +132,12 @@ var rdb = [0,0,0];
 var deficit = 0;
 var frames = 0;
 setInterval(function() {
-  console.clear();
-  console.log('average frame deficit: ', deficit.toFixed(2) + 'ms - fps:', frames)
-  deficit = 0;
-  frames = 0;
+  if (!paused) {
+    console.clear();
+    console.log('average frame deficit: ', deficit.toFixed(2) + 'ms - fps:', frames)
+    deficit = 0;
+    frames = 0;
+  }
 }, 1000)
 
 var density = 0;
@@ -153,7 +155,7 @@ var ctx = fc(function render(dt) {
   var imageData = ctx.createImageData(w, h);
   var buffer = imageData.data;
 
-camera.rotate([0, 0], [.01, .01])
+  !paused && camera.rotate([0, 0], [.01, .01])
 
   var aspect = w/h
   m4perspective(
@@ -181,13 +183,14 @@ camera.rotate([0, 0], [.01, .01])
   v3sub(dcol, planeYPosition, rda);
   v3sub(drow, rdb, rda);
 
-  density+=densityDir;
-  if (density > 254) {
-    densityDir = -1;
-  } else if (density === 0) {
-    densityDir = 1;
+  if (!paused) {
+    density+=densityDir;
+    if (density > 254) {
+      densityDir = -1;
+    } else if (density === 0) {
+      densityDir = 1;
+    }
   }
-
 
   for (var y=0; y<h; y++) {
     planeYPosition[0] += dcol[0];
@@ -252,4 +255,4 @@ camera.rotate([0, 0], [.01, .01])
   }
 
   ctx.putImageData(imageData, 0, 0);
-}, true)
+}, !paused)
