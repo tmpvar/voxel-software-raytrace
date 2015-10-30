@@ -16,6 +16,8 @@ npm install
 
 run `npm run dev` and open a browser to http://localhost:9966
 
+press the `space` key to animate
+
 # license
 
 [MIT](LICENSE.txt)
