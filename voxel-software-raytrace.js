@@ -50,17 +50,17 @@ var modelBounds = [
 
 var model = ndarray(new Int8Array(modelWidth*modelWidth*modelWidth), [modelWidth, modelWidth, modelWidth]);
 fill(model, function(x, y, z) {
-  normal[0] = x - modelHalfWidth
-  normal[1] = y - modelHalfWidth
-  normal[2] = z - modelHalfWidth
-  var d = v3length(normal);
-  if (d<modelHalfWidth) {
-    return 255 - Math.round((d - modelHalfWidth)/modelHalfWidth * 255);
-  }
-
-  // if (x%2 && y%2 && z%2) {
-  //   return 255;
+  // normal[0] = x - modelHalfWidth
+  // normal[1] = y - modelHalfWidth
+  // normal[2] = z - modelHalfWidth
+  // var d = v3length(normal);
+  // if (d<modelHalfWidth) {
+  //   return 255 - Math.round((d - modelHalfWidth)/modelHalfWidth * 255);
   // }
+
+  if (x%2 && y%2 && z%2) {
+    return 127;
+  }
   return 0;
 })
 
