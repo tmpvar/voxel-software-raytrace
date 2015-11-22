@@ -45,25 +45,34 @@ function findOccupiedCell(ubx, uby, ubz, isect, rd, pixels, density, out) {
     var iz = z|0;
 
     if (pixels.get(ix, iy, iz) > density) {
-      out[0] = ix;
-      out[1] = iy;
-      out[2] = iz;
       return out;
     }
 
     if(mx < my) {
       if(mx < mz) {
+        out[0] = -sx;
+        out[1] = out[2] = 0;
+
         x += sx;
         mx += dx;
       } else {
+        out[2] = -sz;
+        out[0] = out[1] = 0;
+
         z += sz;
         mz += dz;
       }
     } else {
       if(my < mz) {
+        out[1] = -sy;
+        out[0] = out[2] = 0;
+
         y += sy;
         my += dy;
       } else {
+        out[2] = -sz;
+        out[0] = out[1] = 0;
+
         z += sz;
         mz += dz;
       }

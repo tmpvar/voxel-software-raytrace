@@ -48,21 +48,20 @@ var modelBounds = [
   [modelWidth, modelWidth, modelWidth]
 ];
 
-var model = ndarray(new Uint8Array(modelWidth*modelWidth*modelWidth), [modelWidth, modelWidth, modelWidth]);
+var model = ndarray(new Int8Array(modelWidth*modelWidth*modelWidth), [modelWidth, modelWidth, modelWidth]);
 fill(model, function(x, y, z) {
   normal[0] = x - modelHalfWidth
   normal[1] = y - modelHalfWidth
   normal[2] = z - modelHalfWidth
   var d = v3length(normal);
-  // if (d<modelHalfWidth) {
+  if (d<modelHalfWidth) {
     return 255 - Math.round((d - modelHalfWidth)/modelHalfWidth * 255);
-  // }
-
+  }
 
   // if (x%2 && y%2 && z%2) {
   //   return 255;
   // }
-  // return 0;
+  return 0;
 })
 
 function getEye(out, view) {
@@ -175,7 +174,6 @@ var ctx = fc(function render(dt) {
 
   getEye(rayOrigin, view);
 
-
   unproject(rda, [0,0,0], viewport, m4inverted) // x=0, y=0
   unproject(rdb, [1,0,0], viewport, m4inverted) // x=1, y=0
   unproject(planeYPosition, [0,1,0], viewport, m4inverted) // x=0, y=1
@@ -233,14 +231,9 @@ var ctx = fc(function render(dt) {
 
         if (cell) {
           found = true;
-          var d = ray.intersects([
-            [cell[0], cell[1], cell[2]],
-            [cell[0]+1, cell[1]+1, cell[2]+1],
-          ], normal)
-          v3normalize(tnormal, normal)
-          buffer[c+0] = 127 + tnormal[0]*255;
-          buffer[c+1] = 127 + tnormal[1]*255;
-          buffer[c+2] = 127 + tnormal[2]*255;
+          buffer[c+0] = 127 + cell[0] * 255;
+          buffer[c+1] = 127 + cell[1] * 255;
+          buffer[c+2] = 127 + cell[2] * 255;
           buffer[c+3] = 255;
         }
       }
