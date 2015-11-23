@@ -56,14 +56,16 @@ fill(model, function(x, y, z) {
   var d = v3length(normal);
   // if (d<modelHalfWidth) {
   //if (z === modelHalfWidth || y === modelHalfWidth || x === modelHalfWidth) {
-   if (x>900*Math.sin(y/z) && y && z) {
-    return 255 - Math.min(Math.round((d - modelWidth)/modelWidth * 255), 255);
+  //if (x>900*Math.sin(y/z) && y && z) {
+  //return x * Math.sin( (y-modelWidth) / (z-modelWidth) ) * 10 + 127 /*- Math.cos(z/y)*/; 
+  return  Math.pow( modelHalfWidth-x ,2)/200+Math.pow( modelHalfWidth-y ,2)/200+ +Math.pow( modelHalfWidth-z ,2)/200
+    //return 255 - Math.min(Math.round((d - modelWidth)/modelWidth * 255), 255);
   // }
 
   //   return 127;
   // }maybe 
     return 127
-  }
+  //}
 
   return 0;
 })
