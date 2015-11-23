@@ -21,9 +21,9 @@ var findOccupiedCell = require('./find-occupied-cell');
 
 var createOrbitCamera = require("orbit-camera")
 
-var modelWidth = 32
+var modelWidth = 128
 var modelHalfWidth = modelWidth/2;
-var camera = createOrbitCamera([modelHalfWidth, modelHalfWidth, -100],
+var camera = createOrbitCamera([modelHalfWidth, modelHalfWidth, 600],
                                [modelHalfWidth, modelHalfWidth, modelHalfWidth],
                                [0, 1, 0])
 var projection = m4create();
@@ -48,19 +48,23 @@ var modelBounds = [
   [modelWidth, modelWidth, modelWidth]
 ];
 
-var model = ndarray(new Int8Array(modelWidth*modelWidth*modelWidth), [modelWidth, modelWidth, modelWidth]);
+var model = ndarray(new Uint8Array(modelWidth*modelWidth*modelWidth), [modelWidth, modelWidth, modelWidth]);
 fill(model, function(x, y, z) {
-  // normal[0] = x - modelHalfWidth
-  // normal[1] = y - modelHalfWidth
-  // normal[2] = z - modelHalfWidth
-  // var d = v3length(normal);
+  normal[0] = x - modelHalfWidth
+  normal[1] = y - modelHalfWidth
+  normal[2] = z - modelHalfWidth
+  var d = v3length(normal);
   // if (d<modelHalfWidth) {
-  //   return 255 - Math.round((d - modelHalfWidth)/modelHalfWidth * 255);
+    return 255 - Math.min(Math.round((d - modelWidth)/modelWidth * 255), 255);
   // }
 
-  if (x%2 && y%2 && z%2) {
-    return 127;
+  // if (x%2 && y%2 && z%2) {
+  //   return 127;
+  // }
+  if (z === modelHalfWidth || y === modelHalfWidth || x === modelHalfWidth) {
+    return 127
   }
+
   return 0;
 })
 
@@ -231,9 +235,9 @@ var ctx = fc(function render(dt) {
 
         if (cell) {
           found = true;
-          buffer[c+0] = 127 + cell[0] * 255;
-          buffer[c+1] = 127 + cell[1] * 255;
-          buffer[c+2] = 127 + cell[2] * 255;
+          buffer[c+0] = cell[0] / modelWidth * 255;
+          buffer[c+1] = cell[1] / modelWidth * 255;
+          buffer[c+2] = cell[2] / modelWidth * 255;
           buffer[c+3] = 255;
         }
       }
