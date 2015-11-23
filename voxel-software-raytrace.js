@@ -55,13 +55,13 @@ fill(model, function(x, y, z) {
   normal[2] = z - modelHalfWidth
   var d = v3length(normal);
   // if (d<modelHalfWidth) {
+  //if (z === modelHalfWidth || y === modelHalfWidth || x === modelHalfWidth) {
+   if (x>900*Math.sin(y/z) && y && z) {
     return 255 - Math.min(Math.round((d - modelWidth)/modelWidth * 255), 255);
   // }
 
-  // if (x%2 && y%2 && z%2) {
   //   return 127;
-  // }
-  if (z === modelHalfWidth || y === modelHalfWidth || x === modelHalfWidth) {
+  // }maybe 
     return 127
   }
 
@@ -114,7 +114,7 @@ window.addEventListener('mousemove', function(ev) {
 });
 
 window.addEventListener('mousewheel', function(ev) {
-  camera.zoom(ev.wheelDeltaY * -.001);
+  camera.zoom(ev.wheelDeltaY * -.1);
   paused && ctx.dirty();
   ev.preventDefault();
 });
@@ -158,7 +158,7 @@ var ctx = fc(function render(dt) {
   var imageData = ctx.createImageData(w, h);
   var buffer = imageData.data;
 
-  !paused && camera.rotate([0, 0], [.01, .01])
+  //!paused && camera.rotate([0, 0], [.01, .01])
 
   var aspect = w/h
   m4perspective(
