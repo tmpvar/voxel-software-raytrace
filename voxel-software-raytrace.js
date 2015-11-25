@@ -21,7 +21,7 @@ var findOccupiedCell = require('./find-occupied-cell');
 
 var createOrbitCamera = require("orbit-camera")
 
-var modelWidth = 128
+var modelWidth = 64 
 var modelHalfWidth = modelWidth/2;
 var camera = createOrbitCamera([modelHalfWidth, modelHalfWidth, 600],
                                [modelHalfWidth, modelHalfWidth, modelHalfWidth],
@@ -54,22 +54,32 @@ fill(model, function(x, y, z) {
   normal[1] = y - modelHalfWidth
   normal[2] = z - modelHalfWidth
   var d = v3length(normal);
-  // if (d<modelHalfWidth) {
-  //if (z === modelHalfWidth || y === modelHalfWidth || x === modelHalfWidth) {
-  //if (x>900*Math.sin(y/z) && y && z) {
-  //return x * Math.sin( (y-modelWidth) / (z-modelWidth) ) * 10 + 127 /*- Math.cos(z/y)*/; 
-  return  Math.pow( modelHalfWidth-x ,2)/200+Math.pow( modelHalfWidth-y ,2)/200+ +Math.pow( modelHalfWidth-z ,2)/200
-    //return 255 - Math.min(Math.round((d - modelWidth)/modelWidth * 255), 255);
-  // }
 
-  //   return 127;
-  // }maybe 
-    return 127
-  //}
-
+  var xn = x/modelWidth
+  var yn = y/modelWidth
+  var zn = z/modelWidth
+  //line 154 gives starting density threshold to display
+  if(!(x>modelHalfWidth&&y>modelHalfWidth&&z>modelHalfWidth)/*&&(x%5)<2*/){
+    //return 5*Math.sin(d/60)*255-(Math.sin(xn/(yn-z))*300) /*- ((Math.sin(x / 8) * Math.sin(y /8) * 48) / modelWidth * z * 10)*/
+    var point = rotate([x,y],[modelHalfWidth,modelHalfWidth/2], 0)
+    return   255*generateDistance[point[0],point[1],zn,modelHalfWidth] +255
+  }
   return 0;
 })
+function rotate(p,f,angle){
+  var s = Math.sin(angle)
+  var c = Math.cos(angle)
+  p[0]-=f[0]
+  p[1]-=f[1]
+  var u = p[0]*c - p[1]*s
+  var v = p[0]*s + p[1]*c
 
+  return( [parseInt(p[0]+u),parseInt(p[1]+v)] )
+}
+function generateDistance(x,y,z,c){
+  var array = [x-c,y-c,z-c]
+  return(v3length(array))
+}
 function getEye(out, view) {
   m4invert(m4scratch, view);
   out[0] = m4scratch[12];
@@ -145,7 +155,7 @@ setInterval(function() {
   }
 }, 1000)
 
-var density = 0;
+var density = 126;
 var densityDir = 1;
 
 var ctx = fc(function render(dt) {
