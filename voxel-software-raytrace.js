@@ -21,7 +21,7 @@ var findOccupiedCell = require('./find-occupied-cell');
 
 var createOrbitCamera = require("orbit-camera")
 
-var modelWidth = 64 
+var modelWidth = 128 
 var modelHalfWidth = modelWidth/2;
 var camera = createOrbitCamera([modelHalfWidth, modelHalfWidth, 600],
                                [modelHalfWidth, modelHalfWidth, modelHalfWidth],
@@ -61,8 +61,9 @@ fill(model, function(x, y, z) {
   //line 154 gives starting density threshold to display
   if(!(x>modelHalfWidth&&y>modelHalfWidth&&z>modelHalfWidth)/*&&(x%5)<2*/){
     //return 5*Math.sin(d/60)*255-(Math.sin(xn/(yn-z))*300) /*- ((Math.sin(x / 8) * Math.sin(y /8) * 48) / modelWidth * z * 10)*/
-    var point = rotate([x,y],[modelHalfWidth,modelHalfWidth/2], 0)
-    return   255*generateDistance[point[0],point[1],zn,modelHalfWidth] +255
+    var point = rotate([x,y],[modelHalfWidth,modelHalfWidth/*(modelHalfWidth/5)*Math.sin(z)*/], (1-zn)*(Math.PI*2) )
+    var zoi = rotate([y,z],[modelHalfWidth/2,modelHalfWidth/5/*(modelHalfWidth/5)*Math.sin(z)*/], xn*(Math.PI*2) )
+    return   (50*Math.cos( generateDistance(point[0],point[1],Math.atan(xn),modelHalfWidth)/5 )/(modelWidth/100))+(50*Math.sin( generateDistance(point[0],point[1],Math.atan(zn),modelHalfWidth)/5 )/(modelWidth/100)) -(100*Math.sin(d/(modelWidth/20)))
   }
   return 0;
 })
